@@ -41,7 +41,11 @@ Python · Jupyter/Google Colab · Hugging Face Transformers · PEFT (LoRA) · Op
 
 Os pesos dos modelos ajustados (LoRA adapters) não estão neste repositório por tamanho (200MB+ ao todo) — a prática recomendada é publicá-los no Hugging Face Hub. As configurações usadas em cada fine-tuning (hiperparâmetros do LoRA) estão documentadas em [`docs/lora_configs`](docs/lora_configs).
 
-> Link para os adaptadores no Hugging Face Hub: *em breve*.
+Adaptadores publicados no Hugging Face Hub:
+- [Qwen 2.5 — qwen-essay-scorer-lora](https://huggingface.co/YurinhoMatsumoto/qwen-essay-scorer-lora)
+- [Llama 3.1 — llama-essay-scorer-lora](https://huggingface.co/YurinhoMatsumoto/llama-essay-scorer-lora)
+- [Mistral — mistral-essay-scorer-lora](https://huggingface.co/YurinhoMatsumoto/mistral-essay-scorer-lora)
+- [Gemma 2 — gemma2-essay-scorer-lora](https://huggingface.co/YurinhoMatsumoto/gemma2-essay-scorer-lora)
 
 ## Estrutura do repositório
 
@@ -103,7 +107,11 @@ Python · Jupyter/Google Colab · Hugging Face Transformers · PEFT (LoRA) · Op
 
 Fine-tuned model weights (LoRA adapters) are not included in this repository due to size (200MB+ combined) — the recommended practice is publishing them on the Hugging Face Hub instead. The configuration used for each fine-tuning run (LoRA hyperparameters) is documented under [`docs/lora_configs`](docs/lora_configs).
 
-> Hugging Face Hub link for the adapters: *coming soon*.
+Adapters published on the Hugging Face Hub:
+- [Qwen 2.5 — qwen-essay-scorer-lora](https://huggingface.co/YurinhoMatsumoto/qwen-essay-scorer-lora)
+- [Llama 3.1 — llama-essay-scorer-lora](https://huggingface.co/YurinhoMatsumoto/llama-essay-scorer-lora)
+- [Mistral — mistral-essay-scorer-lora](https://huggingface.co/YurinhoMatsumoto/mistral-essay-scorer-lora)
+- [Gemma 2 — gemma2-essay-scorer-lora](https://huggingface.co/YurinhoMatsumoto/gemma2-essay-scorer-lora)
 
 ## Repository structure
 
