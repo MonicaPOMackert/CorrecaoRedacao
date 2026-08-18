@@ -1,8 +1,8 @@
 # Referências / References
 
-Artigos que embasaram a metodologia deste projeto (os PDFs não estão incluídos neste repositório por direitos autorais — apenas os títulos, para consulta).
+Artigos que embasaram a metodologia deste projeto (os PDFs não estão incluídos neste repositório por direitos autorais; apenas os títulos, para consulta).
 
-Papers that informed this project's methodology (PDFs are not included in this repository due to copyright — titles only, for reference).
+Papers that informed this project's methodology (PDFs are not included in this repository due to copyright; titles only, for reference).
 
 - An Empirical Analysis of Large Language Models for Automated Essay Scoring
 - Automated Evaluation Based on Large Language Models: A Systematic Review (Applied Sciences)
