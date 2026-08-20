@@ -2,6 +2,8 @@
 
 > Iniciação Científica (UTFPR): correção automática de redações do ENEM usando Modelos de Linguagem Pré-Treinados (LLMs), com geração de *feedback* formativo para o aluno.
 
+[Leia em inglês ↓](#automated-enem-essay-scoring-with-llms)
+
 ## Sobre o projeto
 
 O ENEM avalia redações em 5 competências (C1-C5), cada uma pontuada de 0 a 200. Fazer essa correção manualmente é caro e lento em escala. Este projeto investiga o quão bem LLMs abertos conseguem reproduzir essa nota e, mais importante, gerar um **feedback formativo** (não só uma nota, mas uma explicação do que o aluno pode melhorar).
