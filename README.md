@@ -89,10 +89,11 @@ Adaptadores publicados no Hugging Face Hub:
 ### Estrutura do repositório
 
 ```
+*.py         > scripts standalone da etapa v7 (avaliação, calibração, reteste por API)
 notebooks/   > um notebook por etapa do experimento (v1 a v6)
 results/     > gráficos e CSVs de resultado de cada etapa
-data/        > dataset usado nos experimentos de feedback (v4)
-docs/        > configurações dos adaptadores LoRA e referências bibliográficas
+data/        > dataset de feedback (v4) e amostra fixa de 300 redações (v7)
+docs/        > configs dos adaptadores LoRA, referências e log datado de experimentos
 ```
 
 ### Colaboração
@@ -174,10 +175,11 @@ Adapters published on the Hugging Face Hub:
 ### Repository structure
 
 ```
+*.py         > standalone stage-v7 scripts (evaluation, calibration, API re-test)
 notebooks/   > one notebook per experiment stage (v1 to v6)
 results/     > charts and result CSVs for each stage
-data/        > dataset used in the feedback experiments (v4)
-docs/        > LoRA adapter configs and bibliography
+data/        > feedback dataset (v4) and fixed 300-essay sample (v7)
+docs/        > LoRA adapter configs, bibliography, dated experiment log
 ```
 
 ### Collaboration
