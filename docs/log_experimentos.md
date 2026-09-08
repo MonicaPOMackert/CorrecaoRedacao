@@ -20,6 +20,7 @@ menor. "Calibrado" = deslocamento de viés aprendido out-of-fold (`calibrate.py`
 | 2026-09-03 | Gemini 3.8 Flash | holístico | 60 | 0,40 | 0,42 | 0,42 | modelo preview, RPD real ~13 por conta. Pior que o Flash Lite. Descartado |
 | 2026-09-04 | Gemini 3.5 Flash Lite | MTS2 (C1/C5 dedicado) | 257 | 0,54 | 0,60 | 0,60 | prompt estruturado para C1 e C5. Não melhorou. C1 piorou (0,29 para 0,21), C5 igual. Descartado |
 | 2026-09-04 | verificação de métricas | - | - | - | - | - | `verify_metrics.py`: QWK, Pearson, Spearman e MAE batem com scikit-learn/scipy e com o valor calculado pelo notebook v5 |
+| 2026-09-08 | Gemini 3.5 Flash Lite | MTS_FS (few-shot com âncoras) | 297 | 0,58 | 0,60 | 0,62 | uma redação âncora por faixa de nota por competência. Sobe a discriminação bruta (Pearson 0,60 para 0,62) e reduz o viés (-82 para -59), mas o total calibrado empata em 0,60. C1 0,29 para 0,34, C3 e C4 sobem, C5 travado em 0,33. Adotado como variante padrão do MTS |
 
 ### QWK por competência (bruto), Flash Lite
 
@@ -28,9 +29,11 @@ menor. "Calibrado" = deslocamento de viés aprendido out-of-fold (`calibrate.py`
 | holístico | 0,29 | 0,46 | 0,38 | 0,29 | 0,33 |
 | MTS | 0,29 | 0,50 | 0,41 | 0,40 | 0,33 |
 | MTS2 | 0,21 | 0,56 | 0,40 | 0,38 | 0,32 |
+| MTS_FS | 0,34 | 0,48 | 0,46 | 0,49 | 0,33 |
 
-C1 (norma culta) e C5 (proposta de intervenção) são os gargalos. O MTS levanta C2, C3 e C4.
-Nem o MTS nem o MTS2 mexeram em C1 e C5.
+O few-shot com âncoras (MTS_FS) finalmente move C1 (0,29 para 0,34) e sobe C3 e C4.
+C5 (proposta de intervenção) continua travado em 0,33 em todos os modos: o modelo dá nota 0
+quando a proposta é parcial. Esse é o gargalo isolado atual.
 
 ## Cotas diárias das APIs gratuitas
 
@@ -69,10 +72,25 @@ Temos 5 contas Groq. gpt-oss-120b holístico nas 300: cabe em 1 dia com as 5 con
 
 ## Próximos passos
 
-1. C1 e C5 continuam o gargalo. Próxima ideia: few-shot com redações âncora (exemplo de
-   proposta de intervenção parcial com a nota certa) em vez de mudar a estrutura do prompt.
-   Mudar estrutura já foi testado no MTS2 e não funcionou.
-2. Trilha de feedback formativo: o modo MTS já gera justificativa por competência no campo
+1. **C5 é o gargalo isolado.** MTS_FS (âncoras) resolveu C1 mas não C5. Próximo teste
+   (`--modo mts_fs2`): combinar âncoras + checklist dos 5 elementos só no C5, com aviso
+   explícito de que nota parcial não é 0. Código já pronto.
+2. Se o mts_fs2 também não resolver C5: Reflect-and-Revise da rubrica de C5 (CoNLL 2026),
+   iterativo num fold de validação com gabarito.
+3. Features linguísticas para C1: rodar LanguageTool (offline, pt-BR) e injetar a contagem
+   de erros no prompt de C1 como contexto.
+4. Trilha de feedback formativo: o modo MTS já gera justificativa por competência no campo
    `raw`. Avaliar com rubrica mais avaliação humana, usando o Banco de Redações da UOL como
    referência parcial.
-3. gpt-oss-120B em modo MTS (Groq), para ver se o ganho do MTS vale para o modelo aberto.
+5. gpt-oss-120B em modo MTS (Groq), para ver se o ganho do MTS vale para o modelo aberto.
+
+### Base na literatura (Qualis A/A1)
+
+- Few-shot com âncoras: "Anchor is the key" (Studies in Educational Evaluation, 2026);
+  "Specialists or Generalists?" (2026) reporta +26% de QWK com 2 exemplos por faixa.
+- Reflect-and-Revise: "Automated Refinement of Essay Scoring Rubrics via Reflect-and-Revise"
+  (CoNLL 2026), ganho de até +0,4 QWK sem treino.
+- Features linguísticas: "Improve LLM-based AES with Linguistic Features" (arXiv 2502.09497).
+- Teto realista: "Has AES Reached Sufficient Accuracy? QWK Ceilings from Classical Test
+  Theory" (arXiv 2604.19131) e PROPOR 2026 (gap ao oráculo de 0,15 a 0,29 por trait).
+  Alvo realista para o total: 0,65 a 0,68, não 0,73.

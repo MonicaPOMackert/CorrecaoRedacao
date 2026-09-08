@@ -6,5 +6,6 @@ results/api/_debug*
 results/api/log_*.txt
 results/api/flmts_*.csv
 results/api/flmts2_*.csv
+results/api/flmtsfs_*.csv
 results/api/groq_h_*.csv
 results/api/flash38_h_*.csv

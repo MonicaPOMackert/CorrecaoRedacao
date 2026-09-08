@@ -62,6 +62,16 @@ NIVEIS = ("0 = ausente/desconsiderando o solicitado; 40 = precario; 80 = mediano
 _last_call: dict[str, float] = {}
 _drop: dict[str, set] = {}  # "provider/model" -> campos opcionais que o modelo rejeita
 KEY_ENV: str | None = None  # sobrescreve o nome da variavel da chave (--key-env)
+_anchors: dict[str, str] | None = None  # comp -> bloco de exemplos, carregado sob demanda
+
+
+def _bloco_anchors(comp, path="data/anchors.csv"):
+    global _anchors
+    if _anchors is None:
+        a = pd.read_csv(path)
+        _anchors = {c: "\n".join(f"EXEMPLO ({c} = {r.band}):\n{r.essay}\n"
+                                 for r in a[a.comp == c].itertuples()) for c in COMPS}
+    return _anchors[comp]
 
 
 def _get_key(provider):
@@ -184,6 +194,42 @@ def prompt_mts(essay, comp):
     )
 
 
+def prompt_mts_fs(essay, comp):
+    """MTS com exemplos ancora (few-shot) por faixa de nota, um por faixa."""
+    return (
+        f"Voce e avaliador oficial de redacoes do ENEM. Avalie SOMENTE a competencia {comp}.\n\n"
+        f"{comp}: {RUBRICA[comp]}\n"
+        f"Pontue em 0, 40, 80, 120, 160 ou 200.\n\n"
+        f"Use os exemplos abaixo para calibrar a escala. Note que notas parciais existem: "
+        f"uma resposta incompleta nao e automaticamente 0.\n\n"
+        f"{_bloco_anchors(comp)}\n"
+        f"REDACAO A AVALIAR:\n{essay}\n\n"
+        f'Responda APENAS com JSON: {{"{comp}": valor, "justificativa": "1 a 3 frases"}}'
+    )
+
+
+def prompt_mts_fs2(essay, comp):
+    """mts_fs para C1-C4; para C5, ancoras + checklist dos 5 elementos (opcao A)."""
+    if comp != "C5":
+        return prompt_mts_fs(essay, comp)
+    return (
+        "Voce e avaliador oficial de redacoes do ENEM. Avalie SOMENTE a competencia C5 "
+        "(proposta de intervencao para o problema, respeitando os direitos humanos).\n\n"
+        "Passo 1: verifique cada elemento na proposta e marque presente ou ausente: "
+        "agente (quem faz), acao (o que faz), modo/meio (como), efeito (para que), "
+        "detalhamento (explica algum elemento).\n"
+        "Passo 2: conte os elementos validos e articulados ao problema. A nota segue a "
+        "contagem, NAO e tudo ou nada: 200 os 5; 160 quatro; 120 tres; 80 dois; 40 um; "
+        "0 so quando nao ha proposta alguma ou ela fere direitos humanos.\n\n"
+        "Exemplos para calibrar a escala:\n\n"
+        f"{_bloco_anchors('C5')}\n"
+        f"REDACAO A AVALIAR:\n{essay}\n\n"
+        'Responda APENAS com JSON: {"C5": valor, "elementos": {"agente": true, "acao": '
+        'true, "meio": true, "efeito": true, "detalhamento": true}, '
+        '"justificativa": "1 a 3 frases"}'
+    )
+
+
 def prompt_mts_v2(essay, comp):
     """Igual ao mts para C2/C3/C4; para C1 e C5 pede analise estruturada antes da nota."""
     if comp == "C1":
@@ -253,8 +299,9 @@ def score_redacao(provider, model, essay, modo, temperature):
         notas = parse_notas(resp)
         raw = "" if notas else str(resp)  # guarda a resposta crua so quando o parse falha
     else:
-        gerar = prompt_mts_v2 if modo == "mts2" else prompt_mts
-        maxtok = 800 if modo == "mts2" else 512
+        gerar = {"mts2": prompt_mts_v2, "mts_fs": prompt_mts_fs,
+                 "mts_fs2": prompt_mts_fs2}.get(modo, prompt_mts)
+        maxtok = 800 if modo in ("mts2", "mts_fs2") else 512
         notas, partes = {}, []
         for c in COMPS:
             resp = chat(provider, model, gerar(essay, c), temperature, maxtok)
@@ -323,7 +370,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--provider", choices=PROVIDERS)
     ap.add_argument("--model")
-    ap.add_argument("--modo", choices=["holistico", "mts", "mts2"], default="holistico")
+    ap.add_argument("--modo", choices=["holistico", "mts", "mts2", "mts_fs", "mts_fs2"],
+                    default="holistico")
     ap.add_argument("--amostra", default="data/amostra_300.csv")
     ap.add_argument("--out")
     ap.add_argument("--temperature", type=float, default=0.1)
