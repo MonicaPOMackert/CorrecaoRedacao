@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+
+# saidas intermediarias e de depuracao dos retestes por API
+results/api/_debug*
+results/api/log_*.txt
+results/api/flmts_*.csv
+results/api/flmts2_*.csv
+results/api/groq_h_*.csv
+results/api/flash38_h_*.csv
