@@ -20,7 +20,8 @@ menor. "Calibrado" = deslocamento de viés aprendido out-of-fold (`calibrate.py`
 | 2026-09-03 | Gemini 3.8 Flash | holístico | 60 | 0,40 | 0,42 | 0,42 | modelo preview, RPD real ~13 por conta. Pior que o Flash Lite. Descartado |
 | 2026-09-04 | Gemini 3.5 Flash Lite | MTS2 (C1/C5 dedicado) | 257 | 0,54 | 0,60 | 0,60 | prompt estruturado para C1 e C5. Não melhorou. C1 piorou (0,29 para 0,21), C5 igual. Descartado |
 | 2026-09-04 | verificação de métricas | - | - | - | - | - | `verify_metrics.py`: QWK, Pearson, Spearman e MAE batem com scikit-learn/scipy e com o valor calculado pelo notebook v5 |
-| 2026-09-08 | Gemini 3.5 Flash Lite | MTS_FS (few-shot com âncoras) | 297 | 0,58 | 0,60 | 0,62 | uma redação âncora por faixa de nota por competência. Sobe a discriminação bruta (Pearson 0,60 para 0,62) e reduz o viés (-82 para -59), mas o total calibrado empata em 0,60. C1 0,29 para 0,34, C3 e C4 sobem, C5 travado em 0,33. Adotado como variante padrão do MTS |
+| 2026-09-08 | Gemini 3.5 Flash Lite | MTS_FS (few-shot com âncoras) | 297 | 0,58 | 0,60 | 0,62 | uma redação âncora por faixa de nota por competência. Sobe a discriminação bruta (Pearson 0,60 para 0,62) e reduz o viés (-82 para -59), mas o total calibrado empata em 0,60. C1 0,29 para 0,34, C3 e C4 sobem, C5 travado em 0,33 |
+| 2026-09-09 | Gemini 3.5 Flash Lite | MTS_FS2 (âncoras + checklist no C5) | 296 | 0,59 | 0,61 | 0,60 | âncoras em C1 a C4, mais checklist dos 5 elementos e aviso "parcial não é 0" só no C5. C5 sai de 0,33 para 0,35 e o viés do C5 quase some (média 90 para 113, humano 119). Melhor config até agora: QWK bruto 0,59, viés geral -36. Total calibrado 0,605. Adotado como padrão |
 
 ### QWK por competência (bruto), Flash Lite
 
@@ -30,10 +31,11 @@ menor. "Calibrado" = deslocamento de viés aprendido out-of-fold (`calibrate.py`
 | MTS | 0,29 | 0,50 | 0,41 | 0,40 | 0,33 |
 | MTS2 | 0,21 | 0,56 | 0,40 | 0,38 | 0,32 |
 | MTS_FS | 0,34 | 0,48 | 0,46 | 0,49 | 0,33 |
+| MTS_FS2 | 0,35 | 0,47 | 0,43 | 0,48 | 0,35 |
 
-O few-shot com âncoras (MTS_FS) finalmente move C1 (0,29 para 0,34) e sobe C3 e C4.
-C5 (proposta de intervenção) continua travado em 0,33 em todos os modos: o modelo dá nota 0
-quando a proposta é parcial. Esse é o gargalo isolado atual.
+O few-shot com âncoras (MTS_FS) move C1 (0,29 para 0,34) e sobe C3 e C4. O MTS_FS2 adiciona
+checklist no C5 e finalmente tira o C5 do lugar (0,33 para 0,35), cortando o viés de nota 0.
+C5 segue sendo o pior trait. Próximo alvo: Reflect-and-Revise da rubrica de C5.
 
 ## Cotas diárias das APIs gratuitas
 
@@ -63,6 +65,17 @@ Temos 5 contas Groq. gpt-oss-120b holístico nas 300: cabe em 1 dia com as 5 con
 
 - Cerebras: sem crédito, trial de 5 dólares não foi provisionado para a organização.
 - Maritaca (Sabiá): pedido de créditos acadêmicos feito no início de 2026, sem retorno.
+
+## Gasto diário registrado
+
+| Data | O que rodou | Chamadas por conta Gemini | Sobra estimada |
+|---|---|---|---|
+| 2026-09-08 | mts_fs 300 (60 x 5) + 2 smokes | ~350 (conta 1), ~300 (contas 2-5) | conta 1 ~150, contas 2-5 ~200 |
+| 2026-09-09 | mts_fs2 300 (60 x 5), rodado pela colega na máquina dela | ~300 por conta | ~200 por conta |
+
+Regra: antes de disparar um run grande, somar o que já foi gasto no dia. mts_fs / mts_fs2
+de 300 redações custam 300 chamadas por conta (60 redações x 5 competências). Cabe 1 run
+por dia por lote de 5 contas. RPD zera ~04:00 BRT.
 
 ## Consumo por tipo de teste
 

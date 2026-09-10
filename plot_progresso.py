@@ -23,7 +23,7 @@ from evaluate import evaluate_pair  # noqa: E402
 
 MAP = "results/v5_experimentos_v2/index_prompt_map.csv"
 FL_H = "results/api/flashlite_holistico.csv"
-FL_M = "results/api/flashlite_mts.csv"
+FL_M = "results/api/flashlite_mtsfs2.csv"  # melhor config: MTS + ancoras few-shot + checklist C5
 GO_H = "results/api/groq_holistico.csv"
 
 
@@ -57,7 +57,7 @@ def main():
         ("Gemma 7B\nfew-shot\n(calibrado)", qwk_total_calibrado("results/v5_experimentos_v2/ck2_gemma.csv")),
         ("gpt-oss-120B\nholistico\n(calibrado)", qwk_total_calibrado(GO_H)),
         ("Flash Lite\nholistico\n(calibrado)", qwk_total_calibrado(FL_H)),
-        ("Flash Lite\nMTS\n(calibrado)", qwk_total_calibrado(FL_M)),
+        ("Flash Lite\nMTS+ancoras\n(calibrado)", qwk_total_calibrado(FL_M)),
     ]
     comp_go, comp_h, comp_m = qwk_por_comp(GO_H), qwk_por_comp(FL_H), qwk_por_comp(FL_M)
 
@@ -86,7 +86,7 @@ def main():
     w = 0.27
     ax2.bar(x - w, [comp_go[f"C{i}"] for i in range(1, 6)], w, label="gpt-oss-120B holis.", color="#9FB4DC")
     ax2.bar(x, [comp_h[f"C{i}"] for i in range(1, 6)], w, label="Flash Lite holis.", color="#5C7FBF")
-    ax2.bar(x + w, [comp_m[f"C{i}"] for i in range(1, 6)], w, label="Flash Lite MTS", color="#2E5EA8")
+    ax2.bar(x + w, [comp_m[f"C{i}"] for i in range(1, 6)], w, label="Flash Lite MTS+ancoras", color="#2E5EA8")
     ax2.set_xticks(x)
     ax2.set_xticklabels([f"C{i}" for i in range(1, 6)])
     ax2.set_ylabel("QWK por competencia (bruto)")
